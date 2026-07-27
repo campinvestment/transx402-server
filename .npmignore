@@ -1,0 +1,8 @@
+src/
+*.test.ts
+tsconfig.json
+tsconfig.build.json
+vitest.config.*
+.github/
+.gitignore
+*.tgz
