@@ -89,4 +89,47 @@ describe("processPaymentGate", () => {
     });
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
+
+  test("returns code and details when facilitation fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            production: { chainId: 8453, tokens: { IDRX: "0xabc" } },
+          }),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          json: async () => ({
+            error: {
+              code: "settlement_failed",
+              message: "x402 settlement failed",
+              details: { errorReason: "execution reverted: insufficient balance" },
+            },
+          }),
+        })
+    );
+
+    const result = await processPaymentGate({
+      headers: { "payment-signature": encodePayload(paymentPayload) },
+      facilitatorUrl: "http://localhost:3402",
+      apiKey: "ipk_live_test",
+      configSection: "production",
+      payTo: "0xmerchant",
+      priceIdr: "5000",
+      resourceUrl: "http://localhost:3420/api/premium",
+    });
+
+    expect(result).toEqual({
+      kind: "failed",
+      status: 500,
+      error: "x402 settlement failed",
+      code: "settlement_failed",
+      details: { errorReason: "execution reverted: insufficient balance" },
+    });
+  });
 });

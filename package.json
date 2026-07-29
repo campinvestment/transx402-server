@@ -1,6 +1,6 @@
 {
   "name": "@transx402/server",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "IDRX x402 server helpers for merchants — 402 responses, payment headers, facilitate",
   "type": "module",
   "license": "MIT",

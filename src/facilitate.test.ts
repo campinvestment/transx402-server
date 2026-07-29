@@ -60,4 +60,39 @@ describe("facilitatePayment", () => {
     expect(body.paymentPayload.accepted.amount).toBe("500000");
     expect(body.paymentRequirements.amount).toBe("500000");
   });
+
+  test("throws FacilitationError with code and details from API body", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        json: async () => ({
+          error: {
+            code: "settlement_failed",
+            message: "x402 settlement failed",
+            details: { errorReason: "execution reverted: custom error" },
+          },
+        }),
+      })
+    );
+
+    await expect(
+      facilitatePayment({
+        facilitatorUrl: "http://localhost:3402",
+        apiKey: "ipk_live_test",
+        paymentSignature: encodePayload({
+          x402Version: 2,
+          accepted: { amount: "500000" },
+          payload: {},
+        }),
+      })
+    ).rejects.toMatchObject({
+      name: "FacilitationError",
+      code: "settlement_failed",
+      message: "x402 settlement failed",
+      details: { errorReason: "execution reverted: custom error" },
+      httpStatus: 500,
+    });
+  });
 });

@@ -1,4 +1,5 @@
 import type { ConfigSection } from "./api-key.js";
+import { isFacilitationError } from "./errors.js";
 import { getPaymentHeader, type HeaderSource } from "./payment-header.js";
 import { buildPaymentRequired } from "./payment-required.js";
 import { facilitatePayment } from "./facilitate.js";
@@ -7,7 +8,13 @@ import type { PaymentRequiredResponse } from "./types.js";
 export type ProcessPaymentGateResult =
   | { kind: "paymentRequired"; status: 402; body: PaymentRequiredResponse }
   | { kind: "settled"; status: 200; txHash: string | null }
-  | { kind: "failed"; status: 402 | 500; error: string };
+  | {
+      kind: "failed";
+      status: 402 | 500;
+      error: string;
+      code?: string;
+      details?: Record<string, string>;
+    };
 
 export async function processPaymentGate(options: {
   headers: HeaderSource;
@@ -48,6 +55,16 @@ export async function processPaymentGate(options: {
       txHash: settlement.txHash,
     };
   } catch (err) {
+    if (isFacilitationError(err)) {
+      return {
+        kind: "failed",
+        status: err.httpStatus as 402 | 500,
+        error: err.message,
+        code: err.code,
+        details: err.details,
+      };
+    }
+
     const message = err instanceof Error ? err.message : String(err);
     return {
       kind: "failed",

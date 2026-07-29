@@ -1,4 +1,8 @@
 import { decodePaymentSignature } from "./decode-signature.js";
+import {
+  FacilitationError,
+  facilitationHttpStatus,
+} from "./errors.js";
 import type { PaymentRequiredResponse } from "./types.js";
 
 export async function facilitatePayment(options: {
@@ -26,12 +30,19 @@ export async function facilitatePayment(options: {
 
   if (!response.ok) {
     const error = (await response.json().catch(() => null)) as {
-      error?: { message?: string; code?: string };
+      error?: {
+        code?: string;
+        message?: string;
+        details?: Record<string, string>;
+      };
     } | null;
-    throw new Error(
-      error?.error?.message ??
-        `Payment facilitation failed (${response.status})`
-    );
+    const code = error?.error?.code ?? "facilitation_failed";
+    const message =
+      error?.error?.message ?? `Payment facilitation failed (${response.status})`;
+    throw new FacilitationError(code, message, {
+      details: error?.error?.details,
+      httpStatus: facilitationHttpStatus(code),
+    });
   }
 
   const result = (await response.json()) as {

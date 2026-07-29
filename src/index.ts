@@ -1,3 +1,4 @@
+export { FacilitationError } from "./errors.js";
 export { toIdrxBaseUnits } from "./amount.js";
 export { detectApiKeyFamily, type ConfigSection } from "./api-key.js";
 export {
