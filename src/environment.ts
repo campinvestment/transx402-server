@@ -32,8 +32,8 @@ function assertApiKeyMatchesEnvironment(
 }
 
 /**
- * Resolve facilitator URL from a conflict-free options union.
- * Throws if both `environment` and `facilitatorUrl` are set, or neither.
+ * Resolve facilitator URL and config section.
+ * `facilitatorUrl` optionally overrides preset host when `environment` is set.
  */
 export function resolveServerConfig(options: {
   apiKey: string;
@@ -41,18 +41,10 @@ export function resolveServerConfig(options: {
   facilitatorUrl?: string;
 }): { facilitatorUrl: string; configSection: ConfigSection } {
   const hasEnvironment = options.environment != null;
-  const hasFacilitatorUrl =
-    typeof options.facilitatorUrl === "string" &&
-    options.facilitatorUrl.length > 0;
+  const facilitatorOverride = options.facilitatorUrl?.trim();
+  const hasFacilitatorOverride = Boolean(facilitatorOverride);
 
-  if (hasEnvironment && hasFacilitatorUrl) {
-    throw new Error(
-      "Set either `environment` or `facilitatorUrl`, not both. " +
-        "Chain params always come from GET /config."
-    );
-  }
-
-  if (!hasEnvironment && !hasFacilitatorUrl) {
+  if (!hasEnvironment && !hasFacilitatorOverride) {
     throw new Error(
       'Set `environment` ("local" | "camp" | "base") or `facilitatorUrl`. ' +
         "No silent default — choose explicitly."
@@ -63,13 +55,14 @@ export function resolveServerConfig(options: {
     const environment = options.environment!;
     assertApiKeyMatchesEnvironment(options.apiKey, environment);
     return {
-      facilitatorUrl: FACILITATOR_PRESETS[environment],
+      facilitatorUrl:
+        facilitatorOverride || FACILITATOR_PRESETS[environment],
       configSection: environmentToConfigSection(environment),
     };
   }
 
   return {
-    facilitatorUrl: options.facilitatorUrl!,
+    facilitatorUrl: facilitatorOverride!,
     configSection: detectApiKeyFamily(options.apiKey),
   };
 }

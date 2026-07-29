@@ -37,13 +37,23 @@ describe("resolveServerConfig", () => {
     ).toThrow(/does not match/);
   });
 
-  test("rejects both environment and facilitatorUrl", () => {
-    expect(() =>
-      resolveServerConfig({
-        apiKey: "ipk_sandbox_x",
-        environment: "local",
-        facilitatorUrl: "http://localhost:3402",
-      })
-    ).toThrow(/not both/);
+  test("camp with facilitatorUrl override uses custom host and sandbox section", () => {
+    const r = resolveServerConfig({
+      apiKey: "ipk_sandbox_x",
+      environment: "camp",
+      facilitatorUrl: "http://localhost:3402",
+    });
+    expect(r.facilitatorUrl).toBe("http://localhost:3402");
+    expect(r.configSection).toBe("sandbox");
+  });
+
+  test("base with facilitatorUrl override uses custom host and production section", () => {
+    const r = resolveServerConfig({
+      apiKey: "ipk_live_x",
+      environment: "base",
+      facilitatorUrl: "http://localhost:3402",
+    });
+    expect(r.facilitatorUrl).toBe("http://localhost:3402");
+    expect(r.configSection).toBe("production");
   });
 });
