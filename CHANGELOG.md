@@ -2,6 +2,13 @@
 
 All notable changes to `@transx402/server` are documented in this file.
 
+## [0.2.0] - 2026-07-30
+
+### Changed
+
+- `verifyPayment` now calls `GET /payments/:txHash` instead of deprecated `GET /verify/:txHash`
+- `VerifyPaymentResult` includes `resource`, `description`, `blockNumber`, and `timestamp` for deferred unlock flows (e.g. pay-per-article)
+
 ## [0.1.0] - 2026-07-27
 
 ### Added

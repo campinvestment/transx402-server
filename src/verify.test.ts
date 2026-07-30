@@ -7,7 +7,7 @@ afterEach(() => {
 });
 
 describe("verifyPayment", () => {
-  test("GETs /verify/:txHash with API key", async () => {
+  test("GETs /payments/:txHash with API key", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -19,6 +19,10 @@ describe("verifyPayment", () => {
         token: "IDRX",
         amount: "500000",
         network: "sandbox",
+        blockNumber: 12345,
+        timestamp: "2026-04-01T10:30:00.000Z",
+        resource: "https://example.com/article/123",
+        description: null,
       }),
     });
     vi.stubGlobal("fetch", fetchMock);
@@ -30,8 +34,9 @@ describe("verifyPayment", () => {
     });
 
     expect(result.verified).toBe(true);
+    expect(result.resource).toBe("https://example.com/article/123");
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:3402/verify/0xtx",
+      "http://localhost:3402/payments/0xtx",
       expect.objectContaining({
         headers: { "X-API-Key": "ipk_sandbox_test" },
       })

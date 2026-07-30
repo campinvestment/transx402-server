@@ -7,7 +7,7 @@ export async function verifyPayment(
   options: VerifyPaymentOptions
 ): Promise<VerifyPaymentResult> {
   const base = options.facilitatorUrl.replace(/\/$/, "");
-  const url = `${base}/verify/${encodeURIComponent(options.txHash)}`;
+  const url = `${base}/payments/${encodeURIComponent(options.txHash)}`;
   const res = await fetch(url, {
     headers: { "X-API-Key": options.apiKey },
   });

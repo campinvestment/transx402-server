@@ -88,7 +88,7 @@ await client.fetch("/api/premium");
 | `processPaymentGate` | No header → 402; header → facilitate |
 | `hasPaymentHeader` / `getPaymentHeader` | Read `PAYMENT-SIGNATURE` / `X-PAYMENT` |
 | `decodePaymentSignature` | Base64 JSON decode of payment payload |
-| `verifyPayment` | Post-settlement `GET /verify/:txHash` (requires API key) |
+| `verifyPayment` | Post-settlement `GET /payments/:txHash` (requires API key) |
 | `toIdrxBaseUnits` | Whole IDR → IDRX base units (×100) |
 | `resolveServerConfig` / `FACILITATOR_PRESETS` | Facilitator URL + sandbox/production section |
 

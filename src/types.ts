@@ -52,4 +52,8 @@ export interface VerifyPaymentResult {
   token: string;
   amount: string;
   network: string;
+  blockNumber: number | null;
+  timestamp: string | null;
+  resource: string | null;
+  description: string | null;
 }
