@@ -1,32 +1,14 @@
 import { toIdrxBaseUnits } from "./amount.js";
+import { fetchFacilitatorConfig } from "./facilitator-config.js";
 import type {
   BuildPaymentRequiredOptions,
   PaymentRequiredResponse,
 } from "./types.js";
 
-interface FacilitatorConfigResponse {
-  sandbox?: {
-    chainId: number;
-    tokens?: { IDRX?: string };
-  };
-  production?: {
-    chainId: number;
-    tokens?: { IDRX?: string };
-  };
-}
-
 export async function buildPaymentRequired(
   options: BuildPaymentRequiredOptions
 ): Promise<PaymentRequiredResponse> {
-  const base = options.facilitatorUrl.replace(/\/$/, "");
-  const response = await fetch(`${base}/config`);
-  if (!response.ok) {
-    throw new Error(
-      `Failed to load facilitator config from ${base}/config (${response.status})`
-    );
-  }
-
-  const json = (await response.json()) as FacilitatorConfigResponse;
+  const json = await fetchFacilitatorConfig(options.facilitatorUrl);
   const section = json[options.configSection];
   if (!section?.chainId || !section.tokens?.IDRX) {
     throw new Error(

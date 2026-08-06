@@ -2,6 +2,14 @@
 
 All notable changes to `@transx402/server` are documented in this file.
 
+## [0.2.1] - 2026-08-06
+
+### Added
+
+- `fetchFacilitatorConfig` — shared upstream `GET /config` fetch
+- `handleFacilitatorConfigRequest` — Web Standard handler for merchant config proxy routes
+- `browserFacilitatorProxyBase` / `DEFAULT_FACILITATOR_CONFIG_PROXY_BASE` — same-origin path helpers for browser clients
+
 ## [0.2.0] - 2026-07-30
 
 ### Changed

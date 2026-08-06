@@ -6,6 +6,14 @@ export {
   resolveServerConfig,
   type TransX402Environment,
 } from "./environment.js";
+export {
+  browserFacilitatorProxyBase,
+  DEFAULT_FACILITATOR_CONFIG_PROXY_BASE,
+  fetchFacilitatorConfig,
+  handleFacilitatorConfigRequest,
+  type FacilitatorConfigProxyOptions,
+  type FacilitatorConfigResponse,
+} from "./facilitator-config.js";
 export { buildPaymentRequired } from "./payment-required.js";
 export {
   hasPaymentHeader,

@@ -65,25 +65,58 @@ export async function GET(request: Request) {
 }
 ```
 
-Pair with the browser client:
+Pair with the browser client (use a same-origin config proxy — see below):
 
 ```ts
 import { createBrowserClient } from "@transx402/client/browser";
 
 const client = createBrowserClient({
-  apiKey: "ipk_sandbox_...", // not needed for server settlement; omit or use publishable key only for direct mode
   environment: "local",
   settlement: "server", // default for fetch()
+  configProxyPath: "/api/transx402",
 });
 
 await client.fetch("/api/premium");
 ```
+
+## Config proxy (server settlement)
+
+Browsers load chain params via `GET /config`. Without a merchant-domain CORS allowlist on the hosted facilitator, that cross-origin call fails. Expose a **same-origin proxy** on your backend and point the browser client at it.
+
+Default proxy base path: `/api/transx402` (client appends `/config`).
+
+```ts
+// app/api/transx402/config/route.ts
+import {
+  handleFacilitatorConfigRequest,
+  resolveServerConfig,
+} from "@transx402/server";
+
+const apiKey = process.env.TRANSX402_API_KEY_SANDBOX!;
+
+export async function GET(request: Request) {
+  const { facilitatorUrl } = resolveServerConfig({
+    apiKey,
+    environment: "camp",
+  });
+
+  return handleFacilitatorConfigRequest(request, {
+    facilitatorUrl,
+    isConfigured: () => Boolean(apiKey?.trim()),
+  });
+}
+```
+
+Your payment Route Handler still calls the facilitator **directly** server-to-server for `GET /config` (402 body) and `POST /facilitate`. Only the browser uses the proxy.
 
 ## API
 
 | Export | Purpose |
 |--------|---------|
 | `buildPaymentRequired` | Build x402 v2 402 JSON from facilitator `/config` |
+| `fetchFacilitatorConfig` | Upstream `GET /config` (shared by 402 builder and proxy) |
+| `handleFacilitatorConfigRequest` | Web Standard handler for merchant config proxy routes |
+| `browserFacilitatorProxyBase` / `DEFAULT_FACILITATOR_CONFIG_PROXY_BASE` | Same-origin base path for browser clients |
 | `facilitatePayment` | Decode header → `POST /facilitate` |
 | `processPaymentGate` | No header → 402; header → facilitate |
 | `hasPaymentHeader` / `getPaymentHeader` | Read `PAYMENT-SIGNATURE` / `X-PAYMENT` |
