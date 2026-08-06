@@ -2,6 +2,18 @@
 
 All notable changes to `@transx402/server` are documented in this file.
 
+## [0.3.0] - 2026-08-06
+
+### Changed
+
+- **Breaking:** Introduce Stripe-style `TransX402` client. Configure once with `new TransX402(apiKey, { environment?, facilitatorUrl? })`, then call `payments.*` / `config.*`.
+- **Breaking:** Remove public credentialed free functions: `resolveServerConfig`, `processPaymentGate`, `facilitatePayment`, `verifyPayment`, `buildPaymentRequired`, `fetchFacilitatorConfig`, `handleFacilitatorConfigRequest`.
+
+### Added
+
+- `TransX402` class with `payments` (`processGate`, `facilitate`, `verify`, `buildRequired`) and `config` (`handleRequest`, `fetch`) resources
+- Pure helpers remain free exports (`hasPaymentHeader`, `toIdrxBaseUnits`, `FACILITATOR_PRESETS`, etc.)
+
 ## [0.2.1] - 2026-08-06
 
 ### Added
